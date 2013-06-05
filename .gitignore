@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# root files
+*root
+
+# compiled executables
+*exe
+
