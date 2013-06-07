@@ -119,12 +119,12 @@ int main()
 	outtree->Branch("gg_mass", &gg_mass, "gg_mass/F");
 
 
-	int nevents[20] = {0};
-	string eventcut[20];
+	int nevents[30] = {0};
+	string eventcut[30];
 	int njets[20] = {0};
   int decade = 0;
   int totevents = intree->GetEntries();
-  if(DEBUG) totevents = 100;
+  if(DEBUG) totevents = 500;
   cout << "#entries= " << totevents << endl;
   // loop over events
   for(int ievt=0 ; ievt < totevents ; ievt++)
@@ -155,11 +155,12 @@ int main()
 		if( (PhotonsMass < 130.) ) continue;
 		nevents[7]++; eventcut[7] = "After mgg > 130";
 
-		int njets_passing_kLooseID;
+		int njets_passing_kLooseID = 0;
 		if( j1_pt > 0.) njets_passing_kLooseID++;
 		if( j2_pt > 0.) njets_passing_kLooseID++;
 		if( j3_pt > 0.) njets_passing_kLooseID++;
 		if( j4_pt > 0.) njets_passing_kLooseID++;
+		if(DEBUG) cout << "njets_passing_kLooseID= " << njets_passing_kLooseID << endl;
 		// take only the subset of events where at least two jets remains
 		if( njets_passing_kLooseID < 2 ) continue;
 		nevents[8]++; eventcut[8] = "After njet > 2";
@@ -169,6 +170,10 @@ int main()
 		vector<float> jetE;
 		vector<float> jetEta;
 		vector<float> jetPhi;
+		jetPt.clear();
+		jetE.clear();
+		jetEta.clear();
+		jetPhi.clear();
 
 		// loop over jets, store jet info + info on closest genjet / parton (no selection applied)
 		for( int ijet = 0 ; ijet < min(njets_passing_kLooseID, 4); ijet ++ )
@@ -218,16 +223,20 @@ int main()
 				jet.SetPtEtaPhiE(j4_pt, j4_eta, j4_phi, j4_e);
 			} // end if jet == 3
 
+			if(DEBUG) cout << "\tjet_pt= " << jet_pt << "\tjet_eta= " << jet_eta << "\tjet_betaStarClassic/log(nvtx-0.64)= " << jet_betaStarClassic / log(nvtx-0.64) << "\tjet_dR2Mean= " << jet_dR2Mean << endl;
 			// jet selection
 			// ** acceptance + pu id **
 			if( jet_pt < 25. ) continue;
+			if(DEBUG) cout << "jet[" << ijet << "] survives pt cut" << endl;
 			njets[1]++;
 			if( fabs(jet_eta) > 4.7 ) continue;
+			if(DEBUG) cout << "jet[" << ijet << "] survives eta cut" << endl;
 			njets[2]++;
 			if( (fabs(jet_eta)<2.5) && ((jet_betaStarClassic > 0.2*log(nvtx-0.64)) || (jet_dR2Mean>0.06)) ) continue;
 			else if( (fabs(jet_eta)>2.5) && (fabs(jet_eta)<2.75) && ((jet_betaStarClassic > 0.3*log(nvtx-0.64)) || (jet_dR2Mean>0.05)) ) continue;
 			else if( (fabs(jet_eta)>2.75) && (fabs(jet_eta)<3.) && (jet_dR2Mean>0.05) ) continue;
 			else if( (fabs(jet_eta)>3.) && (fabs(jet_eta)<4.7) && (jet_dR2Mean>0.055) ) continue;
+			if(DEBUG) cout << "jet[" << ijet << "] survives pu rejection" << endl;
 			njets[3]++;
 			// ** store 4-momentum + csv output for combinatorics **
 			jetPt.push_back(jet_pt);
@@ -235,10 +244,13 @@ int main()
 			jetEta.push_back(jet_eta);
 			jetPhi.push_back(jet_phi);
 		} // end of loop over jets
-		
+	
+		if(DEBUG) cout << "Njets left after jet cuts: jetPt.size()= " << jetPt.size() << endl;	
 		// jet combinatorics
-		if( jetPt.size() < 2 ) continue;
-		nevents[9]++; eventcut[9] = "njet> 2 After jet pt,eta cut and pu id";
+//		if( jetPt.size() < 2 ) continue;
+//		nevents[9]++; eventcut[9] = "njet> 2 After jet pt,eta cut and pu id";
+		if( jetPt.size() != 2 ) continue;
+		nevents[9]++; eventcut[9] = "njet == 2 After jet pt,eta cut and pu id";
 
 		int ij1 = 0;
 		int ij2 = 1;
@@ -286,6 +298,7 @@ int main()
 		gg_eta = gg.Eta();
 		gg_mass = gg.M();
 
+		if(DEBUG) cout << "jj_mass= " << jj_mass << endl;
 		if( jj_mass < 300 ) continue;
 		nevents[10]++; eventcut[10] = "m_jj > 300";
 		if( jj_mass < 400 ) continue;
@@ -302,6 +315,26 @@ int main()
 		nevents[16]++; eventcut[16] = "m_jj > 900";
 		if( jj_mass < 1000 ) continue;
 		nevents[17]++; eventcut[17] = "m_jj > 1000";
+		if( jj_mass < 1100 ) continue;
+		nevents[18]++; eventcut[18] = "m_jj > 1100";
+		if( jj_mass < 1200 ) continue;
+		nevents[19]++; eventcut[19] = "m_jj > 1200";
+		if( jj_mass < 1300 ) continue;
+		nevents[20]++; eventcut[20] = "m_jj > 1300";
+		if( jj_mass < 1400 ) continue;
+		nevents[21]++; eventcut[21] = "m_jj > 1400";
+		if( jj_mass < 1500 ) continue;
+		nevents[22]++; eventcut[22] = "m_jj > 1500";
+		if( jj_mass < 1600 ) continue;
+		nevents[23]++; eventcut[23] = "m_jj > 1600";
+		if( jj_mass < 1700 ) continue;
+		nevents[24]++; eventcut[24] = "m_jj > 1700";
+		if( jj_mass < 1800 ) continue;
+		nevents[25]++; eventcut[25] = "m_jj > 1800";
+		if( jj_mass < 1900 ) continue;
+		nevents[26]++; eventcut[26] = "m_jj > 1900";
+		if( jj_mass < 2000 ) continue;
+		nevents[27]++; eventcut[27] = "m_jj > 2000";
 
 
 		outtree->Fill();
@@ -309,7 +342,7 @@ int main()
 	} // end of loop over events
 
 
-	for(int i=0 ; i < 18 ; i++)
+	for(int i=0 ; i < 28 ; i++)
     cout << "#nevents[" << i << "]= " << nevents[i] << "\teventcut[" << i << "]= " << eventcut[i] << endl;
 	cout << endl;
 	for(int i=0 ; i < 3 ; i++)
